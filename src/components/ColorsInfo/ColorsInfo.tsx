@@ -84,8 +84,8 @@ function ColorInfo({
               border: "1px solid black",
             }}
           ></div>
-          <div>x: {xCoord}</div>
-          <div>y: {yCoord}</div>
+          <div>x: {Math.round(xCoord)}</div>
+          <div>y: {Math.round(yCoord)}</div>
           <div>
             rgb
             <Tooltip

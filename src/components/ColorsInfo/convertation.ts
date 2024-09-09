@@ -7,22 +7,22 @@ interface Xyz {
 }
 
 export function convertRgbToXyz({ r, g, b }: Pixel): Xyz {
-  // Преобразование компонентов RGB из [0, 255] в [0, 1]
-  const red = r / 255;
-  const green = g / 255;
-  const blue = b / 255;
+  // Перевод RGB компонентов из [0, 255] в [0, 1] и гамма-коррекция
+  let red = r / 255.0;
+  let green = g / 255.0;
+  let blue = b / 255.0;
 
-  // Применяем линейное преобразование согласно предоставленной матрице:
-  let x = 0.49 * red + 0.31 * green + 0.2 * blue;
-  let y = 0.177 * red + 0.812 * green + 0.011 * blue;
-  let z = 0.0 * red + 0.01 * green + 0.99 * blue;
+  red = red > 0.04045 ? Math.pow((red + 0.055) / 1.055, 2.4) : red / 12.92;
+  green =
+    green > 0.04045 ? Math.pow((green + 0.055) / 1.055, 2.4) : green / 12.92;
+  blue = blue > 0.04045 ? Math.pow((blue + 0.055) / 1.055, 2.4) : blue / 12.92;
 
-  // Масштабируем результаты, поскольку результаты должны быть в пределах [0, 1]
-  x = x * 100;
-  y = y * 100;
-  z = z * 100;
+  // Корректное линейное преобразование из sRGB -> XYZ
+  const x = 0.4124564 * red + 0.3575761 * green + 0.1804375 * blue;
+  const y = 0.2126729 * red + 0.7151522 * green + 0.072175 * blue;
+  const z = 0.0193339 * red + 0.119192 * green + 0.9503041 * blue;
 
-  return { x, y, z };
+  return { x: x * 100, y: y * 100, z: z * 100 };
 }
 
 interface Lab {
@@ -32,18 +32,23 @@ interface Lab {
 }
 
 function convertXyzToLab({ x, y, z }: Xyz): Lab {
+  // Нормализация XYZ относительно White Point D65
   const xR = x / 95.047;
   const yR = y / 100.0;
   const zR = z / 108.883;
 
-  const vX = xR > 0.008856 ? Math.cbrt(xR) : 7.787 * xR + 16 / 116;
-  const vY = yR > 0.008856 ? Math.cbrt(yR) : 7.787 * yR + 16 / 116;
-  const vZ = zR > 0.008856 ? Math.cbrt(zR) : 7.787 * zR + 16 / 116;
+  const vX = xR > 0.008856 ? Math.pow(xR, 1 / 3) : 7.787 * xR + 16 / 116;
+  const vY = yR > 0.008856 ? Math.pow(yR, 1 / 3) : 7.787 * yR + 16 / 116;
+  const vZ = zR > 0.008856 ? Math.pow(zR, 1 / 3) : 7.787 * zR + 16 / 116;
+
+  const L = 116 * vY - 16;
+  const a = 500 * (vX - vY);
+  const b = 200 * (vY - vZ);
 
   return {
-    l: 116 * vY - 16,
-    a: 500 * (vX - vY),
-    b: 200 * (vY - vZ),
+    l: L,
+    a: a,
+    b: b,
   };
 }
 
