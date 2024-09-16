@@ -1,4 +1,4 @@
-import { Slider } from "@mui/material";
+import { Box, Slider } from "@mui/material";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import {
   ResizeOptionsButton,
@@ -6,6 +6,7 @@ import {
 } from "./ResizeOptionsButton/ResizeOptionsButton";
 import { getResizedNearestNeighborWayImageData } from "./alghorithms";
 import { PixelInfo } from "../ColorsInfo/ColorsInfo";
+import { CurvesButton } from "./CurvesButton/CurvesButton";
 
 const MAX_SCALE = 300;
 const MIN_SCALE = 12;
@@ -45,18 +46,26 @@ export const ImgCanvas: FC<Props> = ({
   onMouseUp,
   onMouseDown,
 }) => {
+  // preview imageData
+  const [previewImageData, setPreviewImageData] = useState<ImageData | null>(
+    null
+  );
+  // --
+
   // canvas
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const canvasHeight = canvas?.clientHeight;
   const canvasWidth = canvas?.clientWidth;
-  const [initialImageData, setInitialImageData] = useState<ImageData>();
-  //
+  const [initialImageData, setInitialImageData] = useState<ImageData | null>(
+    null
+  );
+  // --
 
   // container
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const containerHeight = container?.clientHeight;
   const containerWidth = container?.clientWidth;
-  //
+  // --
 
   const [imgParams, setImgParams] = useState<EasyImg>();
 
@@ -111,7 +120,7 @@ export const ImgCanvas: FC<Props> = ({
       canvasWidth !== undefined &&
       imgParams !== undefined &&
       scale !== undefined &&
-      initialImageData !== undefined;
+      initialImageData !== null;
 
     if (allAsyncDataLoaded) {
       const { height: imageHeight, width: imageWidth } = imgParams;
@@ -140,7 +149,7 @@ export const ImgCanvas: FC<Props> = ({
 
         tempContext?.putImageData(
           getResizedNearestNeighborWayImageData(
-            initialImageData,
+            previewImageData ?? initialImageData,
             imageWidth,
             imageHeight
           ),
@@ -167,12 +176,18 @@ export const ImgCanvas: FC<Props> = ({
     image,
     imgParams,
     initialImageData,
+    previewImageData,
     scale,
   ]);
 
   return (
     <div style={{ height: "100%" }} ref={setContainer}>
-      <div style={{ height: `${RESIZE_BUTTON_HEIGHT}px` }}>
+      <Box
+        style={{ height: `${RESIZE_BUTTON_HEIGHT}px` }}
+        display={"flex"}
+        justifyContent={"center"}
+        flexDirection={"row"}
+      >
         {imgParams && canvasHeight && canvasWidth && (
           <ResizeOptionsButton
             initialHeight={image.height}
@@ -189,7 +204,14 @@ export const ImgCanvas: FC<Props> = ({
             setResizingAlgorithm={setResizingAlghorithm}
           />
         )}
-      </div>
+        {initialImageData && (
+          <CurvesButton
+            imageData={initialImageData}
+            setPreviewImageData={setPreviewImageData}
+            setImageData={setInitialImageData}
+          />
+        )}
+      </Box>
       <div style={{ height: `${SCALE_BAR_HEIGHT}px` }}>
         {scale && (
           <Slider
