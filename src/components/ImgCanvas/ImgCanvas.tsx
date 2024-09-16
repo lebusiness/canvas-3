@@ -171,7 +171,7 @@ export const ImgCanvas: FC<Props> = ({
   ]);
 
   return (
-    <div style={{ height: "100%", width: "100%" }} ref={setContainer}>
+    <div style={{ height: "100%" }} ref={setContainer}>
       <div style={{ height: `${RESIZE_BUTTON_HEIGHT}px` }}>
         {imgParams && canvasHeight && canvasWidth && (
           <ResizeOptionsButton
@@ -179,8 +179,8 @@ export const ImgCanvas: FC<Props> = ({
             initialWidth={image.width}
             newHeight={imgParams.height}
             newWidth={imgParams.width}
-            maxHeight={canvasHeight}
-            maxWidth={canvasWidth}
+            maxHeight={image.height * 2}
+            maxWidth={image.width * 2}
             setImgParams={({ height, width }) => {
               setImgParams((prev) => {
                 return { ...prev, height, width };
@@ -211,7 +211,8 @@ export const ImgCanvas: FC<Props> = ({
       {containerHeight && containerWidth && (
         <canvas
           style={{
-            border: "2px solid rgb(25, 118, 210)",
+            width: "100%",
+            border: "4px solid rgb(25, 118, 210)",
             borderRadius: "10px",
           }}
           height={containerHeight - SCALE_BAR_HEIGHT - RESIZE_BUTTON_HEIGHT}

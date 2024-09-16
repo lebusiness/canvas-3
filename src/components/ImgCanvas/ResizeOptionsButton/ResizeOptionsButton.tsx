@@ -137,7 +137,10 @@ export const ResizeOptionsButton: FC<Props> = ({
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <div>Initial(H*W): {Math.round(initialHeight * initialWidth)}</div>
-          <div>New(H*W): {Math.round(newHeight * newWidth)}</div>
+          <div>Current(H*W): {Math.round(newHeight * newWidth)}</div>
+          <div>
+            Preview(H*W): {Math.round(changedImgHeight * changedImgWidth)}
+          </div>
 
           <Box display={"flex"} gap={1} alignItems={"center"}>
             Units of calculation
@@ -228,10 +231,10 @@ export const ResizeOptionsButton: FC<Props> = ({
             style={{ width: "100%" }}
             onClick={() => {
               const validWidth =
-                changedImgWidth > 0 && changedImgWidth < maxWidth;
+                changedImgWidth > 0 && changedImgWidth <= maxWidth;
 
               const validHeight =
-                changedImgHeight > 0 && changedImgHeight < maxHeight;
+                changedImgHeight > 0 && changedImgHeight <= maxHeight;
 
               if (validWidth && validHeight) {
                 setImgParams({
@@ -241,7 +244,9 @@ export const ResizeOptionsButton: FC<Props> = ({
 
                 setResizingAlgorithm(newResizingAlgorithm);
               } else {
-                alert("not corrent img size");
+                alert(
+                  `not corrent img size, max width - ${maxWidth}, max height - ${maxHeight}`
+                );
               }
             }}
             variant={"contained"}

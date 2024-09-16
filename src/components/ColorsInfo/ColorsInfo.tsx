@@ -3,7 +3,7 @@ import { FC } from "react";
 import { Pixel } from "../ImgCanvas/ImgCanvas";
 import { getBackgroundStyleByPixel } from "../../utils/getBackgroundStyleByPixel";
 import { convertRgbToLab, convertRgbToXyz } from "./convertation";
-import { isAdequateContrast } from "./isAdequateContrast";
+import { getAdequateContrast } from "./isAdequateContrast";
 
 export interface PixelInfo {
   rgb: Pixel;
@@ -43,11 +43,16 @@ export const ColorsInfo: FC<Props> = ({ onClose, primary, secondary }) => {
         {primary && <ColorInfo pixelInfo={primary} name="primary" />}
         {secondary && <ColorInfo pixelInfo={secondary} name={"second"} />}
       </div>
-      {primary &&
-        secondary &&
-        (isAdequateContrast(primary.rgb, secondary.rgb)
-          ? "Цвета контрастны"
-          : "Цвета не контрастны")}
+      {primary && secondary && (
+        <div>
+          {getAdequateContrast(primary.rgb, secondary.rgb) > 4.5
+            ? "Цвета контрастны"
+            : "Цвета не контрастны"}
+          , Контраст:{" "}
+          {getAdequateContrast(primary.rgb, secondary.rgb).toFixed(2)} <br />
+          Для достаточной контрастности нужен контраст {">"} 4.5
+        </div>
+      )}
     </div>
   );
 };

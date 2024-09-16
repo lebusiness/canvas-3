@@ -19,8 +19,8 @@ function contrastRatio(color1: Pixel, color2: Pixel): number {
   return (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05);
 }
 
-export function isAdequateContrast(color1: Pixel, color2: Pixel): boolean {
+export function getAdequateContrast(color1: Pixel, color2: Pixel) {
   const ratio = contrastRatio(color1, color2);
 
-  return ratio > 4.5;
+  return ratio;
 }
