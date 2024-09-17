@@ -7,6 +7,7 @@ import {
 import { getResizedNearestNeighborWayImageData } from "./alghorithms";
 import { PixelInfo } from "../ColorsInfo/ColorsInfo";
 import { CurvesButton } from "./CurvesButton/CurvesButton";
+import { FilterButton } from "./FilterButton/FilterButton";
 
 const MAX_SCALE = 300;
 const MIN_SCALE = 12;
@@ -187,6 +188,7 @@ export const ImgCanvas: FC<Props> = ({
         display={"flex"}
         justifyContent={"center"}
         flexDirection={"row"}
+        gap={1}
       >
         {imgParams && canvasHeight && canvasWidth && (
           <ResizeOptionsButton
@@ -209,6 +211,13 @@ export const ImgCanvas: FC<Props> = ({
             imageData={initialImageData}
             setPreviewImageData={setPreviewImageData}
             setImageData={setInitialImageData}
+          />
+        )}
+        {initialImageData && (
+          <FilterButton
+            imageData={initialImageData}
+            setImageData={setInitialImageData}
+            setPreviewImageData={setPreviewImageData}
           />
         )}
       </Box>

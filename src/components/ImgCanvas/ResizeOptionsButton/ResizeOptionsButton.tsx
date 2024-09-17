@@ -133,7 +133,9 @@ export const ResizeOptionsButton: FC<Props> = ({
 
   return (
     <div>
-      <Button onClick={handleOpen}>Change size</Button>
+      <Button variant={"outlined"} onClick={handleOpen}>
+        Change size
+      </Button>
       <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
           <div>Initial(H*W): {Math.round(initialHeight * initialWidth)}</div>

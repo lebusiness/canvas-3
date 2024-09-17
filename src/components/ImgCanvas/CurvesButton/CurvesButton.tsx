@@ -54,7 +54,9 @@ export const CurvesButton: FC<Props> = ({
 
   return (
     <div>
-      <Button onClick={handleOpen}>Curves</Button>
+      <Button variant={"outlined"} onClick={handleOpen}>
+        Curves
+      </Button>
       <Modal
         open={open}
         onClose={() => {
