@@ -96,7 +96,7 @@ export const FilterButton: React.FC<{
     ({ presetValue, kernel, imageData }: FilterSettings): ImageData => {
       const width = imageData.width;
       const height = imageData.height;
-      const baseKernelCoeff = getBaseKernelCoeff(presetValue);
+      const baseKernelCoeff = getBaseKernelCoeff(presetValue, kernel);
 
       const newImageData = new ImageData(width, height);
       const data = imageData.data;
@@ -124,25 +124,26 @@ export const FilterButton: React.FC<{
       // Применение ядра свертки
       for (let y = 1; y < height + 1; y++) {
         for (let x = 1; x < width + 1; x++) {
-          const newPixel = [0, 0, 0, 0];
+          const newPixel = [0, 0, 0, 255];
           for (let ky = 0; ky < 3; ky++) {
             for (let kx = 0; kx < 3; kx++) {
               const pixelX = x + kx - 1;
               const pixelY = y + ky - 1;
               const pixelIndex = (pixelY * (width + 2) + pixelX) * 4;
-              for (let channel = 0; channel < 4; channel++) {
+              for (let channel = 0; channel < 3; channel++) {
                 newPixel[channel] +=
                   extendedData[pixelIndex + channel] * kernel[ky][kx];
               }
             }
           }
           const newPixelIndex = getIndex(x - 1, y - 1);
-          for (let channel = 0; channel < 4; channel++) {
+          for (let channel = 0; channel < 3; channel++) {
             newData[newPixelIndex + channel] = Math.min(
               255,
               Math.max(0, newPixel[channel] * baseKernelCoeff)
             );
           }
+          newData[newPixelIndex + 3] = 255; // Устанавливаем альфа-канал
         }
       }
 
@@ -151,15 +152,20 @@ export const FilterButton: React.FC<{
     []
   );
 
-  // возвращает коэффициент ядра для каждого предустановленной матрицы
-  const getBaseKernelCoeff = (presetValue: string): number => {
+  // возвращает коэффициент ядра для каждого предустановленной матрицы или пользовательской матрицы
+  const getBaseKernelCoeff = (
+    presetValue: string,
+    kernel: number[][]
+  ): number => {
     switch (presetValue) {
       case "gaussian":
-        return 1 / 16; // 0.0625
+        return 1 / 16;
       case "blur":
         return 1 / 9;
       default:
-        return 1;
+        // eslint-disable-next-line no-case-declarations
+        const kernelSum = kernel.flat().reduce((sum, value) => sum + value, 0);
+        return kernelSum !== 0 ? 1 / kernelSum : 1;
     }
   };
 
@@ -214,7 +220,7 @@ export const FilterButton: React.FC<{
               row.map((value, colIndex) => (
                 <Grid item xs={4} key={`${rowIndex}-${colIndex}`}>
                   <Input
-                    inputProps={{ step: 0.1 }}
+                    inputProps={{ step: 1 }}
                     value={value}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(e: any) =>
